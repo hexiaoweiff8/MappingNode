@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="projectName" source="spring.application.name" defaultValue="app"/>
+    <springProperty scope="context" name="logPath" source="log.path" defaultValue="/data/logs/"/>
+    <springProperty scope="context" name="serverIp" source="server.ip"/>
+    <property name="LOG_HOME" value="${logPath}"/>
+    <property name="PROJECT_NAME" value="${projectName}"/>
+    <property name="SERVER_IP" value="${serverIp}"/>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d %-5level %t %logger{1}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- controller 切面 -->
+    <appender name="file.log.web"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>${LOG_HOME}${PROJECT_NAME}/ing/${SERVER_IP}-web.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}${PROJECT_NAME}/sys/web/${PROJECT_NAME}-%d{yyyyMMdd}.${SERVER_IP}-web.log
+            </fileNamePattern>
+            <maxHistory>180</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d %-5level %t %logger{1}] %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- System log -->
+    <appender name="file.log.sys"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>${LOG_HOME}${PROJECT_NAME}/ing/${SERVER_IP}-sys.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}${PROJECT_NAME}/sys/app/${PROJECT_NAME}-%d{yyyyMMdd}.${SERVER_IP}-sys.log
+            </fileNamePattern>
+            <maxHistory>180</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d %-5level %t %logger{1}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="file.log.sys"/>
+        <appender-ref ref="stdout"/>
+    </root>
+
+    <!-- controller 切面 -->
+    <logger name="webAop" level="INFO" additivity="false">
+        <appender-ref ref="file.log.web"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+</configuration>

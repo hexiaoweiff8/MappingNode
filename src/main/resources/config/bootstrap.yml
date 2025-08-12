@@ -1,0 +1,51 @@
+server:
+  port: 8109
+  tomcat:
+    uri-encoding: utf-8
+    max-connections: 1024
+    accept-count: 1024
+    threads:
+      max: 200
+  servlet:
+    context-path: /
+  http2:
+    enabled: true
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: prod
+  application:
+    name: mappingNode
+  task:
+    execution:
+      pool:
+        core-size: 100     # 核心线程数
+        max-size: 200      # 最大线程数
+
+  datasource:
+    druid:
+      master:
+        url: jdbc:mysql://192.168.101.90:3306/5g_cloud_platform_test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false
+        username: 5gmobile
+        password: txC7Rv9E@123
+      slave:
+        url: jdbc:mysql://192.168.101.90:3306/5g_cloud_platform_test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false
+        username: 5gmobile
+        password: txC7Rv9E@123
+      driverClassName: com.mysql.cj.jdbc.Driver
+      validation-query: SELECT 1 FROM DUAL
+      initial-size: 5
+      max-active: 30
+      min-idle: 5
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      filters: conn,config,stat,slf4j
+
+# mybatis配置
+mybatis:
+  mapper-locations: classpath:org.mappingnode.mapper/*Mapper.xml
+  type-aliases-package: org.mappingnode.idmapping.entity
+  configuration:
+    map-underscore-to-camel-case: true

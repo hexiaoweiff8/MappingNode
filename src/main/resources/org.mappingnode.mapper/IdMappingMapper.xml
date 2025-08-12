@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mappingnode.idmapping.mapper.IdMappingMapper">
+
+
+    <!--创建表-->
+    <insert id="createTable" parameterType="String">
+        CREATE TABLE ${tableName} (
+           `from_id` varchar(40) NOT NULL COMMENT 'fromId',
+           `to_id` varchar(40) NOT NULL COMMENT 'toId',
+           PRIMARY KEY (`from_id`,`to_id`),
+           KEY `ft` (`from_id`,`to_id`) USING BTREE,
+           KEY `tf` (`to_id`,`from_id`) USING BTREE
+        ) ENGINE=InnoDB;
+    </insert>
+
+    <!---验证表是否存在-->
+    <select id="isTableExist" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_name = #{tableName}
+        );
+    </select>
+
+    <!---fromId查询-->
+    <select id="selectFromId" resultType="String">
+        SELECT from_id from ${tableName} where to_id = #{toId};
+    </select>
+
+    <!---toId查询-->
+    <select id="selectToId" resultType="String">
+        SELECT to_id from ${tableName} where from_id = #{fromId};
+    </select>
+
+    <!--批量插入数据-->
+    <insert id="insertTo" parameterType="list">
+        INSERT INTO ${tableName} (from_id, to_id) VALUES
+        <foreach collection="list" item="qo" separator=",">
+            (#{qo.fromId},#{qo.toId})
+        </foreach>
+        ;
+    </insert>
+
+    <!--删除超时数据-->
+    <delete id="deleteExpired" parameterType="String">
+        delete from ${tableName} where from_id &lt;= #{expiredId} limit #{limit};
+    </delete>
+
+    <!--批量删除数据-->
+    <delete id="deleteBatchWithFromId" parameterType="String">
+        delete from ${tableName} where from_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ;
+    </delete>
+
+    <!--批量删除数据-->
+    <delete id="deleteBatchWithToId" parameterType="String">
+        delete from ${tableName} where to_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ;
+    </delete>
+</mapper>
